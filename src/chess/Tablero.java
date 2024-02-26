@@ -15,9 +15,9 @@ public class Tablero {
 	public static Ficha matriz[][] = new Ficha[8][8];
 	
 	public Tablero() {
-		// inicialización del tablero 
+		// inicializaciï¿½n del tablero 
 		
-		//inicialización la matriz con vacio
+		//inicializaciï¿½n la matriz con vacio
 		for(int i = 0;i <matriz.length;i++){
 	      for(int j = 0;j <matriz.length;j++){
 	        matriz[j][i] = new Ficha();}
@@ -76,16 +76,4 @@ public class Tablero {
 		}
 		
 	}
-	
-	public int movimiento(int x, int y, int i , int j) {
-		
-		Clasifica clasificacion=new Clasifica();
-		clasificacion.initProc();
-		
-		return j;
-		
-		
-	}
-	
-	
 }	

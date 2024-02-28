@@ -8,8 +8,11 @@ public class CasillaPeonInicio extends Casilla {
 	}
 	
 	public ArrayList<Tupla> salir(Tupla destino) {
-		if (TIPO.PEON == ficha.getTipo())
-			ficha.setLimite(1);
+		if (TIPO.PEON == ficha.getTipo()) {
+			ficha.setLimite(-1);
+			if (COLOR.BLANCO == ficha.getColor())
+				ficha.setLimite(1);
+		}
 
 		return super.salir(destino);
 	}

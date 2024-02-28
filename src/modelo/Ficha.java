@@ -51,4 +51,24 @@ public class Ficha {
 	public COLOR getColor() {
 		return color;
 	}
+	
+	public boolean comprobar(Tupla inicio, Tupla destino, Tablero tablero) {
+		IMovimiento movimientoValido = null;
+		for (IMovimiento movimiento : this.movimientos) {
+			boolean comprobacionAprovada = movimiento.comprobar(inicio, destino, limite);
+			if (comprobacionAprovada) {
+				movimientoValido = movimiento;
+				break;
+			}
+		}
+		
+		if (null == movimientoValido)
+			return false;
+
+		boolean trayectoriaValida = movimientoValido.revisarTrayectoria(inicio, destino, tablero);
+		if (!trayectoriaValida)
+			return false;
+		
+		return true;
+	}
 }

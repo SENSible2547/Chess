@@ -8,11 +8,12 @@ public class FabricaFichas {
 	private static final MovimientoLineal lineal = new MovimientoLineal();
 	private static final MovimientoCaballo caballo = new MovimientoCaballo();
 	private static final MovimientoDiagonal diagonal = new MovimientoDiagonal();
-	private static final MovimientoPeon peon = new MovimientoPeon(diagonal);
+	private static final MovimientoPeon peon = new MovimientoPeon();
 		
 	public static Ficha crearFicha(COLOR color, TIPO tipo) {
 		ArrayList<IMovimiento> movimientos = new ArrayList();
 		Ficha ficha;
+		int limite = 7;
 		
 		switch (tipo) {
 		case ALFIL:
@@ -27,30 +28,20 @@ public class FabricaFichas {
 			break;
 		case TORRE:
 			movimientos.add(lineal);
-			break;		
-		default:
-		}
-		
-		ficha = new Ficha(color, tipo, movimientos);
-		ficha.setLimite(0);
-		
-		return ficha;
-	}
-	
-	public static Ficha crearFicha(COLOR color, TIPO tipo, int limite) {
-		ArrayList<IMovimiento> movimientos = new ArrayList();
-		Ficha ficha;
-		
-		switch (tipo) {
+			break;
 		case REY:
 			movimientos.add(diagonal);
 			movimientos.add(lineal);
+			limite = 1;
 			break;
-		default:
-			// peon
+		case PEON:
 			movimientos.add(peon);
+			limite = 2;
+			if (COLOR.NEGRO == color)
+				limite = -2;
+		default:
 		}
-	
+		
 		ficha = new Ficha(color, tipo, movimientos);
 		ficha.setLimite(limite);
 		

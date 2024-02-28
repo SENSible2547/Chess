@@ -2,11 +2,13 @@ package modelo;
 
 public class CasillaMovimientoPeonDoble extends Casilla {
 	private boolean movimientoDoble;
-	private final Motor motor;
+	private Motor motor;
 	
-	public CasillaMovimientoPeonDoble(Tupla posicion, Motor motor) {
+	public CasillaMovimientoPeonDoble(Tupla posicion) {
 		super(posicion);
-		this.motor = motor;
 	}
 	
+	public void agregarMotor(Motor motor) {
+		this.motor = motor;
+	}
 }

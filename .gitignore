@@ -1,4 +1,7 @@
+.idea/
 /bin/
+/classes/
+src/*/*.iml
 .gitconfig
 .project
 .classpath

@@ -12,27 +12,53 @@ public class test_main {
 		tablero.inicializar();
 		motor.inicio();
 
-		int x, y;
-		boolean movimientoRealizado = false;
-		Tupla inicio, destino; 
-		
+		int x, y, opcion;
+		Tupla inicio, destino;
+
 		do {
 			tablero.mostrar();
 
+			print_menu();
+
+			System.out.printf("Opcion> ");
+			opcion = scan.nextInt();
+
 			System.out.printf("%s\n", motor.getTurno());
-			System.out.printf("Inicio> ");
-			x = scan.nextInt();
-			y = scan.nextInt();
-			inicio = new Tupla(x, y);
+			switch (opcion) {
+				case 1:
+					System.out.printf("Inicio> ");
+					x = scan.nextInt();
+					y = scan.nextInt();
+					inicio = new Tupla(x, y);
 
-			System.out.printf("Destino> ");
-			x = scan.nextInt();
-			y = scan.nextInt();
-			destino = new Tupla(x, y);
+					System.out.printf("Destino> ");
+					x = scan.nextInt();
+					y = scan.nextInt();
+					destino = new Tupla(x, y);
 
-			movimientoRealizado = motor.mover(inicio, destino);
+					motor.mover(inicio, destino);
+					break;
+				case 2:
+					System.out.printf("Selección> ");
+					x = scan.nextInt();
+					y = scan.nextInt();
+					inicio = new Tupla(x, y);
 
-		} while(true);
+					for (Tupla posibilidad : motor.seleccionar(inicio)) {
+						System.out.printf("%s\n", posibilidad.toString());
+					}
+					break;
+				default:
+					break;
+			}
+		} while(0 != opcion);
 		
 	}
+
+	private static void print_menu() {
+		System.out.printf("0. Salir\n");
+		System.out.printf("1. Mover\n");
+		System.out.printf("2. Seleccionar\n");
+	}
 }
+

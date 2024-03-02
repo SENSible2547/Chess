@@ -3,54 +3,83 @@ package modelo;
 import java.util.ArrayList;
 
 public class MovimientoPeon implements IMovimiento {
-	public boolean comprobar(Tupla inicio, Tupla destino, int limite) {
+	public boolean comprobar(Casilla inicio, Casilla destino) {
 		boolean movimiento_correcto = false;
-		Tupla resta = new Tupla(inicio.getX() - destino.getX(), inicio.getY() - destino.getY());
+		int limite = inicio.getFicha().getLimite();
+
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino = destino.getPosicion();
+		Tupla resta = tuplaInicio.restarTupla(tuplaDestino);
 
 		// comprobar avance peon
 		if (0 == resta.getY()) {
-			// si se puede avanzar 2 casillas y se avanza solo 1
-			if (2 == Math.abs(limite) && resta.getX() == limite / 2)
+			if (limite == resta.getX())
 				movimiento_correcto = true;
-			if (resta.getX() == limite)
+			else if (2 == Math.abs(limite) && resta.getX() == limite / 2) // movimiento simple al inicio
 				movimiento_correcto = true;
-
-			return movimiento_correcto;
-		} else if (resta.getX() == resta.getY() && Math.abs(resta.getX()) == 1) { // avance diagonal
-			movimiento_correcto = true;
+		} else if (resta.getX() == resta.getY()) { // comprobar avance diagonal
+			if (Math.abs(resta.getX()) == 1)
+				movimiento_correcto = true;
 		}
 
 		return movimiento_correcto;
 	}
 
-	public boolean revisarTrayectoria(Tupla inicio, Tupla destino, Tablero tablero) {
-		boolean trayectoria_correcta = true;
-		Tupla resta = inicio.restarTupla(destino);
-		Ficha ficha = tablero.getCasilla(destino).getFicha();
+	public Casilla revisarTrayectoria(Casilla inicio, Casilla destino, Tablero tablero) {
+		Casilla maximo = inicio;
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino = destino.getPosicion();
+		Tupla resta = tuplaInicio.restarTupla(tuplaDestino);
 
-		// avance frontal
-		if (0 == resta.getY()) {
-			if (TIPO.NOFICHA != ficha.getTipo())
-				trayectoria_correcta = false;
+		// avance diagonal
+		if (Math.abs(resta.getX()) == Math.abs(resta.getY()) && TIPO.NOFICHA != destino.getFicha().getTipo())
+			maximo = destino;
+		else if (resta.getY() == 0) { // avance vertical
+			if (TIPO.NOFICHA == destino.getFicha().getTipo())
+				maximo = destino;
 
+			// avance doble
 			if (2 == Math.abs(resta.getX())) {
-				if (1 == inicio.compararX(destino))
-					ficha = tablero.getCasilla(new Tupla(destino.getX() + 1, destino.getY())).getFicha();
-				else
-					ficha = tablero.getCasilla(new Tupla(destino.getX() - 1, destino.getY())).getFicha();
+				TableroIterador iterador = tablero.crearIterador(inicio, destino);
+				Casilla medio;
 
-				if (TIPO.NOFICHA != ficha.getTipo())
-					trayectoria_correcta = false;
+				medio = iterador.siguiente();
+				if (TIPO.NOFICHA != medio.getFicha().getTipo())
+					maximo = medio;
 			}
-			return trayectoria_correcta;
-		} else if (resta.getX() == resta.getY() && TIPO.NOFICHA == ficha.getTipo()) { // avance diagonal
-			trayectoria_correcta = false;
 		}
 
-		return trayectoria_correcta;
+		return maximo;
 	}
 
-	public ArrayList<Tupla> generarPosibilidades(Tupla inicio, Tablero tablero) {
-		return new ArrayList<Tupla>();
+	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Tupla> posibilidades) {
+		ArrayList<Tupla> candidatos = new ArrayList<>();
+		Ficha peon = inicio.getFicha();
+
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino;
+
+		// movimiento diagonal
+		tuplaDestino =  new Tupla((int) (tuplaInicio.getX() - Math.signum(peon.getLimite())), tuplaInicio.getY() - 1);
+		candidatos.add(tuplaDestino);
+		tuplaDestino =  new Tupla((int) (tuplaInicio.getX() - Math.signum(peon.getLimite())), tuplaInicio.getY() + 1);
+		candidatos.add(tuplaDestino);
+
+		// movimiento lineal
+		tuplaDestino =  new Tupla(tuplaInicio.getX() - peon.getLimite(), tuplaInicio.getY());
+		candidatos.add(tuplaDestino);
+
+		Casilla maximo;
+		Casilla destino;
+		for (Tupla candidata : candidatos) {
+			if (tablero.estaDentro(candidata)) {
+				destino = tablero.getCasilla(candidata);
+				maximo = revisarTrayectoria(inicio, destino, tablero);
+				if (maximo != inicio)
+					posibilidades.add(maximo.getPosicion());
+			}
+		}
+
+		// TODO: generar el rango
 	}
 }

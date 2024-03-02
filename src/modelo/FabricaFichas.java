@@ -13,7 +13,7 @@ public class FabricaFichas {
 	public static Ficha crearFicha(COLOR color, TIPO tipo) {
 		ArrayList<IMovimiento> movimientos = new ArrayList();
 		Ficha ficha;
-		int limite = 7;
+		int limite = Tablero.getNumFilas() - 1;
 		
 		switch (tipo) {
 		case ALFIL:

@@ -1,25 +1,21 @@
 package modelo;
 
-import java.util.ArrayList;
-
 public abstract class Casilla {
-	protected final Tupla posicion;
+	private final Tupla posicion;
 	protected Ficha ficha;
 	
 	public Casilla(Tupla posicion) {
 		this.posicion = posicion;
 	}
 		
-	public ArrayList<Tupla> entrar(Tupla inicio) {
-		return new ArrayList<Tupla>();
+	public void entrar(Casilla inicio) {
 	}
 	
-	public ArrayList<Tupla> salir(Tupla destino) {
-		return new ArrayList<Tupla>();
+	public void salir(Casilla destino) {
 	}
 
 	public Ficha getFicha() {
-		return ficha;
+		return this.ficha;
 	}
 
 	public void setFicha(Ficha ficha) {

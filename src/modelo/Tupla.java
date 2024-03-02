@@ -9,8 +9,12 @@ public class Tupla {
 		this.y = y;
 	}
 	
-	public Tupla restarTupla(Tupla a) {
+	public Tupla restarAbsTupla(Tupla a) {
 		return new Tupla(Math.abs(this.x - a.x), Math.abs(this.y - a.y));
+	}
+
+	public Tupla restarTupla(Tupla a) {
+		return new Tupla(this.x - a.x, this.y - a.y);
 	}
 
 	public int compararX(Tupla a) {
@@ -27,6 +31,19 @@ public class Tupla {
 		else if(this.y < a.getY())
 			return -1;
 		return 0;
+	}
+
+	public boolean equals(Tupla a) {
+		boolean equal = true;
+		if (this.x != a.getX() || this.y != a.getY())
+			equal = false;
+
+		return equal;
+	}
+
+	// para propositos de prueba
+	public String toString(){
+		return String.valueOf(this.x) + " " + String.valueOf(this.y);
 	}
 
 	public int getX() {

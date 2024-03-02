@@ -3,56 +3,69 @@ package modelo;
 import java.util.ArrayList;
 
 public class MovimientoLineal implements IMovimiento {
-	public boolean comprobar(Tupla inicio, Tupla destino, int limite) {
-		boolean movimiento_correcto = false;
-		Tupla resta = inicio.restarTupla(destino);
-		
-		if (0 == resta.getX() && resta.getY() <= limite || 0 == resta.getY() && resta.getX() <= limite)
-			movimiento_correcto = true;
+	public boolean comprobar(Casilla inicio, Casilla destino) {
+		int limite = inicio.getFicha().getLimite();
+		boolean movimiento_correcto = true;
+
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino= destino.getPosicion();
+		Tupla resta = tuplaInicio.restarAbsTupla(tuplaDestino);
+
+		if ((0 != resta.getX() || resta.getY() > limite) && (0 != resta.getY() || resta.getX() > limite))
+			movimiento_correcto = false;
 
 		return movimiento_correcto;
 	}
 	
-	public boolean revisarTrayectoria(Tupla inicio, Tupla destino, Tablero tablero) {
-		boolean trayectoria_correcta = true;
-		Ficha ficha;
-		TableroIterador iterador;
-		Tupla aux;
-		Tupla resta = inicio.restarTupla(destino);
+	public Casilla revisarTrayectoria(Casilla inicio, Casilla destino, Tablero tablero) {
+		Casilla maximo = inicio;
 
-		// movimiento lineal horizontal
-		if (0 == resta.getX()) {
-			if (1 == inicio.compararY(destino))
-				iterador = tablero.crearIterador(destino.getY(), inicio.getX());
-			else
-				iterador = tablero.crearIterador(inicio.getY(), inicio.getX());
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino = destino.getPosicion();
+		Tupla resta = tuplaInicio.restarTupla(tuplaDestino);
 
-			for (int i = 1; i < resta.getY(); i++) {
-				ficha = iterador.siguiente_columna().getFicha();
-				if (TIPO.NOFICHA != ficha.getTipo()) {
-					trayectoria_correcta = false;
-					break;
-				}
-			}
-		} else { // movimiento lineal vertical
-			if (1 == inicio.compararX(destino))
-				iterador = tablero.crearIterador(destino.getX(), inicio.getY());
-			else
-				iterador = tablero.crearIterador(inicio.getX(), inicio.getY());
+		TableroIterador	iterador = tablero.crearIterador(inicio, destino);
+		int fichaLimite = inicio.getFicha().getLimite();
+		int limite = Math.min(iterador.getNumIteraciones(), fichaLimite);
 
-			for (int i = 1; i < resta.getX(); i++) {
-				ficha = iterador.siguiente_fila().getFicha();
-				if (TIPO.NOFICHA != ficha.getTipo()) {
-					trayectoria_correcta = false;
-					break;
-				}
+		for (int i = 0; i < limite; i++) {
+			maximo = iterador.siguiente();
+			if (TIPO.NOFICHA != maximo.getFicha().getTipo())
+				break;
+		}
+
+		return maximo;
+	}
+
+	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Tupla> posibilidades) {
+		Tupla tuplaInicio = inicio.getPosicion();
+		Casilla destino;
+		Casilla maximo;
+
+		Tupla tuplaDestino;
+		// posibilidades para el norte y el sur
+		for (int i = 0; i < 8; i += 7) {
+			tuplaDestino = new Tupla(i, tuplaInicio.getY());
+
+			// si la ficha esta en la misma casilla de maximo no agregarla
+			if (0 != tuplaInicio.compararX(tuplaDestino)) {
+				destino = tablero.getCasilla(tuplaDestino);
+				maximo = revisarTrayectoria(inicio, destino, tablero);
+				posibilidades.add(maximo.getPosicion());
 			}
 		}
-		
-		return trayectoria_correcta;
-	}
-	
-	public ArrayList<Tupla> generarPosibilidades(Tupla inicio, Tablero tablero) {
-		return new ArrayList<Tupla>();
+
+		// posibilidades para el oriente y occidente
+		for (int i = 0; i < 8; i += 7) {
+			tuplaDestino = new Tupla(tuplaInicio.getX(), i);
+
+			if (0 != tuplaInicio.compararY(tuplaDestino)) {
+				destino = tablero.getCasilla(new Tupla(tuplaInicio.getX(), i));
+				maximo = revisarTrayectoria(inicio, destino, tablero);
+				posibilidades.add(maximo.getPosicion());
+			}
+		}
+
+		// TODO: generar el rango
 	}
 }

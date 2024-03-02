@@ -2,14 +2,16 @@ package modelo;
 
 public class Tablero {
 	private final Casilla[][] tablero;
-	private static final Ficha noFicha = FabricaFichas.crearFicha(null, TIPO.NOFICHA); 
+	private final Ficha noFicha = FabricaFichas.crearFicha(COLOR.NONE, TIPO.NOFICHA);
+	private final static int numFilas = 8;
+	private final static int numColumnas = 8;
 	
 	public Tablero() {
 		Casilla casilla;
 
-		tablero = new Casilla[8][8];
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
+		tablero = new Casilla[numFilas][numColumnas];
+		for (int i = 0; i < this.numFilas; i++) {
+			for (int j = 0; j < numColumnas; j++) {
 				if (6 == i | 1 == i)
 					casilla = new CasillaPeonInicio(new Tupla(i, j));
 				else if (4 == i | 3 == i)
@@ -42,7 +44,8 @@ public class Tablero {
 		// agregar reinas
 		tablero[7][3].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.REINA));
 		tablero[0][3].setFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.REINA));
-		
+
+
 		// agregar caballos
 		tablero[7][1].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.CABALLO));
 		tablero[7][6].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.CABALLO));
@@ -73,18 +76,19 @@ public class Tablero {
 		tablero[6][5].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.PEON));
 	}
 
+	// para propositos de pruebas
 	public void mostrar() {
 		Ficha ficha;
 		char letra = '.';
 
 		System.out.printf("\t");
-		for (int i = 0; i < 8; i++)
+		for (int i = 0; i < numColumnas; i++)
 			System.out.printf("%d\t", i);
 		System.out.print("\n");
 
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < numFilas; i++) {
 			System.out.printf("%d\t", i);
-			for (int j = 0; j < 8; j++) {
+			for (int j = 0; j < numColumnas; j++) {
 				ficha = this.getCasilla(new Tupla(i, j)).getFicha();
 
 				switch(ficha.getTipo()) {
@@ -118,13 +122,30 @@ public class Tablero {
 	public Casilla getCasilla(Tupla posicion) {
 		return tablero[posicion.getX()][posicion.getY()];
 	}
-	
 
-	public static Ficha getNoficha() {
+	public Ficha getNoficha() {
 		return noFicha;
 	}
 
-	public TableroIterador crearIterador(int inicio, int camino) {
-		return new TableroIterador(this, inicio, camino);
+	public TableroIterador crearIterador(Casilla inicio, Casilla destino) {
+		TableroIterador iteradorAsignado = TableroIterador.fabricarIterador(this, inicio.getPosicion(), destino.getPosicion());
+		return iteradorAsignado;
+	}
+
+	public static int getNumFilas() {
+		return numFilas;
+	}
+
+	public static int getNumColumnas() {
+		return numColumnas;
+	}
+
+	public boolean estaDentro(Tupla posicion) {
+		boolean dentro = true;
+		if (posicion.getX() < 0 || posicion.getY() < 0)
+			dentro = false;
+		else if (posicion.getX() >= numFilas || posicion.getY() >= numColumnas)
+			dentro = false;
+		return dentro;
 	}
 }

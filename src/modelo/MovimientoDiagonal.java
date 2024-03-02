@@ -3,53 +3,82 @@ package modelo;
 import java.util.ArrayList;
 
 public class MovimientoDiagonal implements IMovimiento {
-	public boolean comprobar(Tupla inicio, Tupla destino, int limite) {
-		boolean movimiento_correcto = false;
-		Tupla resta = inicio.restarTupla(destino);
+	public boolean comprobar(Casilla inicio, Casilla destino) {
+		int limite = inicio.getFicha().getLimite();
+		boolean movimiento_correcto = true;
 
-		if (resta.getX() == resta.getY() && resta.getX() <= limite)
-			movimiento_correcto = true;
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino = destino.getPosicion();
+		Tupla resta = tuplaInicio.restarAbsTupla(tuplaDestino);
+
+		if (resta.getX() != resta.getY() || resta.getX() > limite)
+			movimiento_correcto = false;
 
 		return movimiento_correcto;
 	}
 
-	public boolean revisarTrayectoria(Tupla inicio, Tupla destino, Tablero tablero) {
-		boolean trayectoria_correcta = true;
-		Ficha ficha;
-		TableroIterador iterador;
-		Tupla aux;
+	public Casilla revisarTrayectoria(Casilla inicio, Casilla destino, Tablero tablero) {
+		Casilla maximo = inicio;
 
-		// organizar por el x menor
-		if (1 == inicio.compararX(destino)) {
-			aux = destino;
-			destino = inicio;
-			inicio = aux;
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino = destino.getPosicion();
+		Tupla resta = tuplaInicio.restarTupla(tuplaDestino);
+
+		TableroIterador	iterador = tablero.crearIterador(inicio, destino);
+		int fichaLimite = inicio.getFicha().getLimite();
+		int limite = Math.min(iterador.getNumIteraciones(), fichaLimite);
+
+		for (int i = 0; i < limite; i++) {
+			maximo = iterador.siguiente();
+			if (TIPO.NOFICHA != maximo.getFicha().getTipo())
+				break;
 		}
 
-		// movimiento diagonal hacia la derecha diagonal
-		iterador = tablero.crearIterador(inicio.getX(), inicio.getY());
-		if (inicio.getY() < destino.getY()) {
-			for (int i = 1; i < Math.abs(inicio.getX() - destino.getX()); i++) {
-				ficha = iterador.siguiente_diagonal_derecha().getFicha();
-				if (TIPO.NOFICHA != ficha.getTipo()) {
-					trayectoria_correcta = false;
-					break;
-				}
-			}
-		} else {
-			for (int i = 1; i < Math.abs(inicio.getX() - destino.getX()); i++) {
-				ficha = iterador.siguiente_diagonal_izquierda().getFicha();
-				if (TIPO.NOFICHA != ficha.getTipo()) {
-					trayectoria_correcta = false;
-					break;
-				}
-			}
-		}
-
-		return trayectoria_correcta;
+		return maximo;
 	}
 
-	public ArrayList<Tupla> generarPosibilidades(Tupla inicio, Tablero tablero) {
-		return new ArrayList<Tupla>();
+	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Tupla> posibilidades) {
+		Tupla tuplaInicio = inicio.getPosicion();
+		ArrayList<Tupla> candidatos = new ArrayList<>();
+		Casilla destino;
+		Casilla maximo;
+		int aux;
+
+		// posibilidades para el nororiente
+		// calcular el destino dado que y aumenta
+		aux = Tablero.getNumColumnas() - 1 - tuplaInicio.getY();
+		if (aux > tuplaInicio.getX())
+			aux = tuplaInicio.getX();
+		candidatos.add(new Tupla(tuplaInicio.getX() - aux, tuplaInicio.getY() + aux));
+
+		// posibilidades para el suroccidente
+		// calcular el destino dado que x aumenta
+		aux = Tablero.getNumFilas() - 1 - tuplaInicio.getX();
+		if (aux > tuplaInicio.getY())
+			aux = tuplaInicio.getY();
+		candidatos.add(new Tupla(tuplaInicio.getX() + aux, tuplaInicio.getY() - aux));
+
+		// posibilidades para el noroccidente
+		// calcular el destino dado que se resta el menor numero a ambas coordenadas
+		aux = Math.min(tuplaInicio.getX(), tuplaInicio.getY());
+		candidatos.add(new Tupla(tuplaInicio.getX() - aux, tuplaInicio.getY() - aux));
+
+		// posibilidades para el suroriente
+		// calcular el destino dado que se suma el modulo respecto a 7 del mayor numero a ambas coordenadas
+		if (tuplaInicio.getX() > tuplaInicio.getY())
+			aux = Tablero.getNumFilas() - 1 - tuplaInicio.getX();
+		else
+			aux = Tablero.getNumColumnas() - 1 - tuplaInicio.getY();
+		candidatos.add(new Tupla(tuplaInicio.getX() + aux, tuplaInicio.getY() + aux));
+
+		for (Tupla tuplaDestino : candidatos) {
+			if (!tuplaDestino.equals(tuplaInicio)) {
+				destino = tablero.getCasilla(tuplaDestino);
+				maximo = revisarTrayectoria(inicio, destino, tablero);
+				posibilidades.add(maximo.getPosicion());
+			}
+		}
+
+		// TODO: generar el rango
 	}
 }

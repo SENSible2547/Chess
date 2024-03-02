@@ -3,21 +3,37 @@ package modelo;
 import java.util.ArrayList;
 
 public class MovimientoCaballo implements IMovimiento {
-	public boolean comprobar(Tupla inicio, Tupla destino, int limite) {
-		boolean movimiento_correcto = false;
-		Tupla resta = inicio.restarTupla(destino);
+	public boolean comprobar(Casilla inicio, Casilla destino) {
+		boolean movimiento_correcto = true;
 
-		if (2 == resta.getX() && 1 == resta.getY() || 2 == resta.getY() && 1 == resta.getX())
-			movimiento_correcto = true;
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino = destino.getPosicion();
+		Tupla resta = tuplaInicio.restarAbsTupla(tuplaDestino);
+
+		if ((2 != resta.getX() || 1 != resta.getY()) && (2 != resta.getY() || 1 != resta.getX()))
+			movimiento_correcto = false;
 
 		return movimiento_correcto;
 	}
 
-	public boolean revisarTrayectoria(Tupla inicio, Tupla destino, Tablero tablero) {
-		return true;
+	public Casilla revisarTrayectoria(Casilla inicio, Casilla destino, Tablero tablero) {
+		return destino;
 	}
 
-	public ArrayList<Tupla> generarPosibilidades(Tupla inicio, Tablero tablero) {
-		return new ArrayList<Tupla>();
+	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Tupla> posibilidades) {
+		Tupla tuplaInicio = inicio.getPosicion();
+		Tupla tuplaDestino;
+
+		// generar las 8 posibilidades
+		for (int i = -1; i < 2; i += 2) {
+			for (int j = -1; j < 2; j += 2) {
+				tuplaDestino = new Tupla(tuplaInicio.getX() + 1 * j, tuplaInicio.getY() + 2 * i);
+				if (tablero.estaDentro(tuplaDestino))
+					posibilidades.add(tuplaDestino);
+				tuplaDestino = new Tupla(tuplaInicio.getX() + 2 * j, tuplaInicio.getY() + 1 * i);
+				if (tablero.estaDentro(tuplaDestino))
+					posibilidades.add(tuplaDestino);
+			}
+		}
 	}
 }

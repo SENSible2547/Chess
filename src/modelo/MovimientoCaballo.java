@@ -20,19 +20,19 @@ public class MovimientoCaballo implements IMovimiento {
 		return destino;
 	}
 
-	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Tupla> posibilidades) {
+	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Casilla> posibilidades) {
 		Tupla tuplaInicio = inicio.getPosicion();
-		Tupla tuplaDestino;
+		Tupla candidata;
 
 		// generar las 8 posibilidades
 		for (int i = -1; i < 2; i += 2) {
 			for (int j = -1; j < 2; j += 2) {
-				tuplaDestino = new Tupla(tuplaInicio.getX() + 1 * j, tuplaInicio.getY() + 2 * i);
-				if (tablero.estaDentro(tuplaDestino))
-					posibilidades.add(tuplaDestino);
-				tuplaDestino = new Tupla(tuplaInicio.getX() + 2 * j, tuplaInicio.getY() + 1 * i);
-				if (tablero.estaDentro(tuplaDestino))
-					posibilidades.add(tuplaDestino);
+				candidata = new Tupla(tuplaInicio.getX() + 1 * j, tuplaInicio.getY() + 2 * i);
+				if (tablero.estaDentro(candidata))
+					posibilidades.add(tablero.getCasilla(candidata));
+				candidata = new Tupla(tuplaInicio.getX() + 2 * j, tuplaInicio.getY() + 1 * i);
+				if (tablero.estaDentro(candidata))
+					posibilidades.add(tablero.getCasilla(candidata));
 			}
 		}
 	}

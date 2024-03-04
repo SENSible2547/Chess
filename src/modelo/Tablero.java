@@ -1,16 +1,20 @@
 package modelo;
 
+import java.util.ArrayList;
+
 public class Tablero {
 	private final Casilla[][] tablero;
 	private final Ficha noFicha = FabricaFichas.crearFicha(COLOR.NONE, TIPO.NOFICHA);
 	private final static int numFilas = 8;
 	private final static int numColumnas = 8;
-	
+	private Bando blanco = new Bando();
+	private Bando negro = new Bando();
+
 	public Tablero() {
 		Casilla casilla;
 
 		tablero = new Casilla[numFilas][numColumnas];
-		for (int i = 0; i < this.numFilas; i++) {
+		for (int i = 0; i < numFilas; i++) {
 			for (int j = 0; j < numColumnas; j++) {
 				if (6 == i | 1 == i)
 					casilla = new CasillaPeonInicio(new Tupla(i, j));
@@ -27,6 +31,8 @@ public class Tablero {
 				tablero[i][j].setFicha(noFicha);
 			}
 		}
+
+		inicializar();
 	}
 	
 	public void inicializar() {
@@ -65,21 +71,24 @@ public class Tablero {
 		tablero[0][5].setFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.ALFIL));
 		*/
 
-		tablero[7][0].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.TORRE));
-		tablero[6][0].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.TORRE));
-		tablero[5][0].setFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.TORRE));
-		tablero[5][4].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.ALFIL));
-		tablero[5][3].setFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.REINA));
+		agregarFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.TORRE), new Tupla(7, 0));
+		agregarFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.TORRE), new Tupla(6, 4));
+		agregarFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.TORRE), new Tupla(5, 0));
+		agregarFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.ALFIL), new Tupla(5, 4));
+		agregarFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.REINA), new Tupla(5, 3));
 		tablero[0][4].setFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.REY));
-		tablero[5][5].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.CABALLO));
-		tablero[1][0].setFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.PEON));
-		tablero[6][5].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.PEON));
+		tablero[7][4].setFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.REY));
+		blanco.setPosicionRey(tablero[7][4]);
+		negro.setPosicionRey(tablero[0][4]);
+		agregarFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.CABALLO), new Tupla(5, 5));
+		agregarFicha(FabricaFichas.crearFicha(COLOR.NEGRO, TIPO.PEON), new Tupla(1, 0));
+		agregarFicha(FabricaFichas.crearFicha(COLOR.BLANCO, TIPO.PEON), new Tupla(6, 5));
 	}
 
 	// para propositos de pruebas
 	public void mostrar() {
 		Ficha ficha;
-		char letra = '.';
+		char letra;
 
 		System.out.printf("\t");
 		for (int i = 0; i < numColumnas; i++)
@@ -89,7 +98,7 @@ public class Tablero {
 		for (int i = 0; i < numFilas; i++) {
 			System.out.printf("%d\t", i);
 			for (int j = 0; j < numColumnas; j++) {
-				ficha = this.getCasilla(new Tupla(i, j)).getFicha();
+				ficha = tablero[i][j].getFicha();
 
 				switch(ficha.getTipo()) {
 					case PEON:
@@ -118,7 +127,16 @@ public class Tablero {
 			System.out.print("\n");
 		}
 	}
-	
+
+	private void agregarFicha(Ficha ficha, Tupla posicion) {
+		Casilla casilla = tablero[posicion.getX()][posicion.getY()];
+		casilla.setFicha(ficha);
+		if (ficha.getColor() == COLOR.BLANCO)
+			blanco.getFichas().add(casilla);
+		else
+			negro.getFichas().add(casilla);
+	}
+
 	public Casilla getCasilla(Tupla posicion) {
 		return tablero[posicion.getX()][posicion.getY()];
 	}
@@ -147,5 +165,27 @@ public class Tablero {
 		else if (posicion.getX() >= numFilas || posicion.getY() >= numColumnas)
 			dentro = false;
 		return dentro;
+	}
+
+	public Bando getBando(COLOR color) {
+		Bando bando;
+		if (color == COLOR.BLANCO)
+			bando = blanco;
+		else
+			bando = negro;
+		return bando;
+	}
+
+	public ArrayList<Casilla> obtenerMitad(Casilla cinicio, Casilla cdestino) {
+		ArrayList<Casilla> lista = new ArrayList<>();
+		TableroIterador iterador = crearIterador(cinicio, cdestino);
+
+		int numIteraciones = iterador.getNumIteraciones();
+		iterador.setNumIteraciones(numIteraciones - 1);
+
+		while (iterador.tieneSiguiente())
+			lista.add(iterador.siguiente());
+
+		return lista;
 	}
 }

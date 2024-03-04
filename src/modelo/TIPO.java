@@ -1,6 +1,6 @@
 package modelo;
 
-enum TIPO {
+public enum TIPO {
 	ALFIL,
 	CABALLO,
 	TORRE,

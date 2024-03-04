@@ -52,7 +52,7 @@ public class MovimientoPeon implements IMovimiento {
 		return maximo;
 	}
 
-	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Tupla> posibilidades) {
+	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Casilla> posibilidades) {
 		ArrayList<Tupla> candidatos = new ArrayList<>();
 		Ficha peon = inicio.getFicha();
 
@@ -76,10 +76,8 @@ public class MovimientoPeon implements IMovimiento {
 				destino = tablero.getCasilla(candidata);
 				maximo = revisarTrayectoria(inicio, destino, tablero);
 				if (maximo != inicio)
-					posibilidades.add(maximo.getPosicion());
+					posibilidades.add(maximo);
 			}
 		}
-
-		// TODO: generar el rango
 	}
 }

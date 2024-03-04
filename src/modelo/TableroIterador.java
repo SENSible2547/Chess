@@ -40,6 +40,7 @@ public abstract class TableroIterador {
 			}
 		} else {
 			iteradorAsignado = new IteradorCaballo(tablero, destino.getX(), destino.getY());
+			iteradorAsignado.setNumIteraciones(1);
 		}
 
 		return iteradorAsignado;
@@ -53,13 +54,29 @@ public abstract class TableroIterador {
 		this.avance = 1;
 	}
 
-	public abstract Casilla siguiente();
-
 	public boolean tieneSiguiente() {
-		boolean siguiente = i < numIteraciones;
-		i++;
+		boolean siguiente = false;
+
+		int indiceCopia = indice;
+		int caminoCopia = camino;
+		avanzar();
+
+		if (i < numIteraciones && tablero.estaDentro(new Tupla(indice, camino)))
+			siguiente = true;
+
+		this.indice = indiceCopia;
+		this.camino = caminoCopia;
+
 		return siguiente;
 	}
+
+	public Casilla siguiente() {
+		avanzar();
+		i++;
+		return tablero.getCasilla(new Tupla(indice, camino));
+	}
+
+	protected abstract void avanzar();
 
 	public void setNumIteraciones(int numIteraciones) {
 		this.numIteraciones = numIteraciones;
@@ -69,6 +86,11 @@ public abstract class TableroIterador {
 	public void setAvance(int avance) {
 		this.avance = avance;
 	}
+
+	public void setInicio(Tupla nuevoInicio) {
+		indice = nuevoInicio.getX();
+		camino = nuevoInicio.getY();
+	}
 }
 
 class IteradorVertical extends TableroIterador {
@@ -76,9 +98,8 @@ class IteradorVertical extends TableroIterador {
 		super(tablero, inicio, camino);
 	}
 
-	public Casilla siguiente() {
+	protected void avanzar() {
 		indice += avance;
-		return tablero.getCasilla(new Tupla(indice, camino));
 	}
 }
 
@@ -87,9 +108,8 @@ class IteradorHorizontal extends TableroIterador {
 		super(tablero, inicio, camino);
 	}
 
-	public Casilla siguiente() {
+	protected void avanzar() {
 		camino += avance;
-		return tablero.getCasilla(new Tupla(indice, camino));
 	}
 }
 
@@ -98,10 +118,9 @@ class IteradorNorteDiagonal extends TableroIterador {
 		super(tablero, inicio, camino);
 	}
 
-	public Casilla siguiente() {
+	protected void avanzar() {
 		indice--;
 		camino += avance;
-		return tablero.getCasilla(new Tupla(indice, camino));
 	}
 }
 
@@ -110,10 +129,9 @@ class IteradorSurDiagonal extends TableroIterador {
 		super(tablero, inicio, camino);
 	}
 
-	public Casilla siguiente() {
+	protected void avanzar() {
 		indice++;
 		camino += avance;
-		return tablero.getCasilla(new Tupla(indice, camino));
 	}
 };
 
@@ -122,7 +140,6 @@ class IteradorCaballo extends TableroIterador {
 		super(tablero, inicio, camino);
 	}
 
-	public Casilla siguiente() {
-		return tablero.getCasilla(new Tupla (indice, camino));
+	protected void avanzar() {
 	}
 }

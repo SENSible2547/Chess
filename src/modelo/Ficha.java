@@ -6,21 +6,20 @@ public class Ficha {
 	private COLOR color;
 	private TIPO tipo;
 	private int limite;
-	private ArrayList<IMovimiento> movimientos;
-	private final ArrayList<Tupla> posibilidades = new ArrayList<>();
+	private final ArrayList<IMovimiento> movimientos = new ArrayList<>();
+	private final ArrayList<Casilla> posibilidades = new ArrayList<>();
 	
-	public Ficha(COLOR color, TIPO tipo, ArrayList<IMovimiento> movimientos) {
+	public Ficha(COLOR color, TIPO tipo) {
 		this.color = color;
 		this.tipo = tipo;
-		this.movimientos = movimientos;
+	}
+
+	public ArrayList<IMovimiento> getMovimientos() {
+		return movimientos;
 	}
 
 	public TIPO getTipo() {
 		return tipo;
-	}
-
-	public void setTipo(TIPO tipo) {
-		this.tipo = tipo;
 	}
 
 	public int getLimite() {
@@ -31,7 +30,7 @@ public class Ficha {
 		this.limite = limite;
 	}
 
-	public ArrayList<Tupla> getPosibilidades() {
+	public ArrayList<Casilla> getPosibilidades() {
 		return this.posibilidades;
 	}
 
@@ -40,49 +39,43 @@ public class Ficha {
 	}
 	
 	public boolean comprobar(Casilla inicio, Casilla destino, Tablero tablero) {
-		boolean comprobacionValida = true;
+		boolean comprobacionValida = false;
 
 		// encontrar el movimiento valido para revisar la trayectoria
-		boolean comprobacionAprovada;
+
+		if (!posibilidades.isEmpty()) {
+			comprobacionValida = posibilidades.contains(destino);
+		} else {
+			IMovimiento movimientoValido = validarMovimiento(inicio, destino);
+
+			if (null != movimientoValido) {
+				Casilla maximo = movimientoValido.revisarTrayectoria(inicio, destino, tablero);
+
+				if (maximo == destino)
+					comprobacionValida = true;
+				}
+		}
+
+		return comprobacionValida;
+	}
+
+	public IMovimiento validarMovimiento(Casilla cinicio, Casilla cdestino) {
 		IMovimiento movimientoValido = null;
+
+		boolean comprobacionAprovada;
 		for (IMovimiento movimiento : this.movimientos) {
-			comprobacionAprovada = movimiento.comprobar(inicio, destino);
+			comprobacionAprovada = movimiento.comprobar(cinicio, cdestino);
 			if (comprobacionAprovada) {
 				movimientoValido = movimiento;
 				break;
 			}
 		}
 
-		// no se encontro un movimiento valido
-		if (null == movimientoValido)
-			return false;
-
-		boolean enPosibilidades = buscarPosibilidad(destino.getPosicion());
-		if (!enPosibilidades) {
-			Casilla maximo = movimientoValido.revisarTrayectoria(inicio, destino, tablero);
-			if (maximo != destino)
-				return false;
-		}
-
-		return comprobacionValida;
+		return movimientoValido;
 	}
 
 	public void generarPosibilidades(Casilla casilla, Tablero tablero) {
-		this.getPosibilidades().clear();
 		for (IMovimiento movimiento : this.movimientos)
 			movimiento.generarPosibilidades(casilla, tablero, this.posibilidades);
-	}
-
-	public boolean buscarPosibilidad(Tupla destino) {
-		boolean enPosibilidades = false;
-
-		for (Tupla posibilidad : this.posibilidades) {
-			if (posibilidad.equals(destino)) {
-				enPosibilidades = true;
-				break;
-			}
-		}
-
-		return enPosibilidades;
 	}
 }

@@ -1,0 +1,7 @@
+package modelo;
+
+public enum MENSAJE {
+	JAQUEMATE,
+	MOVIMIENTOINVALIDO,
+	MOVIMIENTOVALIDO
+}

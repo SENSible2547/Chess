@@ -37,7 +37,7 @@ public class MovimientoDiagonal implements IMovimiento {
 		return maximo;
 	}
 
-	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Tupla> posibilidades) {
+	public void generarPosibilidades(Casilla inicio, Tablero tablero, ArrayList<Casilla> posibilidades) {
 		Tupla tuplaInicio = inicio.getPosicion();
 		ArrayList<Tupla> candidatos = new ArrayList<>();
 		Casilla destino;
@@ -75,10 +75,8 @@ public class MovimientoDiagonal implements IMovimiento {
 			if (!tuplaDestino.equals(tuplaInicio)) {
 				destino = tablero.getCasilla(tuplaDestino);
 				maximo = revisarTrayectoria(inicio, destino, tablero);
-				posibilidades.add(maximo.getPosicion());
+				posibilidades.add(maximo);
 			}
 		}
-
-		// TODO: generar el rango
 	}
 }

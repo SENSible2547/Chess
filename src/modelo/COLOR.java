@@ -1,6 +1,6 @@
 package modelo;
 
-enum COLOR {
+public enum COLOR {
 	BLANCO,
 	NEGRO,
 	NONE

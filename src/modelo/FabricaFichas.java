@@ -11,8 +11,9 @@ public class FabricaFichas {
 	private static final MovimientoPeon peon = new MovimientoPeon();
 		
 	public static Ficha crearFicha(COLOR color, TIPO tipo) {
-		ArrayList<IMovimiento> movimientos = new ArrayList();
-		Ficha ficha;
+		Ficha ficha = new Ficha(color, tipo);
+		ArrayList<IMovimiento> movimientos = ficha.getMovimientos();
+
 		int limite = Tablero.getNumFilas() - 1;
 		
 		switch (tipo) {
@@ -42,7 +43,6 @@ public class FabricaFichas {
 		default:
 		}
 		
-		ficha = new Ficha(color, tipo, movimientos);
 		ficha.setLimite(limite);
 		
 		return ficha;
